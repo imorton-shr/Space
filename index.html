@@ -395,7 +395,32 @@
         "eclipse": "eclipse-ja.mp3"
       }
     };
+let currentAudio = null;
 
+function playAudio(section) {
+  const langMap = {
+    en: "en-US",
+    th: "th-TH",
+    zh: "zh-CN",
+    ja: "ja-JP"
+  };
+
+  const fullLang = langMap[currentLanguage] || "en-US";
+
+  const audioPath = audioUrls[fullLang][section];
+
+  if (!audioPath) {
+    console.log("Audio not found:", section);
+    return;
+  }
+
+  if (currentAudio) {
+    currentAudio.pause();
+  }
+
+  currentAudio = new Audio(audioPath);
+  currentAudio.play();
+}
     // Language translations
     const translations = {
       en: {
