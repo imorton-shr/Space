@@ -159,7 +159,7 @@
     <div class="space-y-4">
      <!-- The Sun -->
      <div class="rounded-2xl overflow-hidden shadow-xl" style="background: linear-gradient(135deg, rgba(255,165,0,0.3), rgba(255,69,0,0.3)); border: 3px solid #ffa500;">
-      <button onclick="toggleSection('sun')" class="w-full p-4 flex items-center justify-between text-left">
+      <button onclick="toggleSection('sun'); playAudio('sun')" class="w-full p-4 flex items-center justify-between text-left">
        <div class="flex items-center gap-4">
         <span class="text-5xl float">☀️</span> <span id="sun-title" class="text-2xl font-bold text-yellow-200">The Sun</span>
        </div><span id="sun-arrow" class="text-3xl text-yellow-200 transition-transform duration-300">▼</span> </button>
@@ -171,7 +171,7 @@
       </div>
      </div><!-- The Moon -->
      <div class="rounded-2xl overflow-hidden shadow-xl" style="background: linear-gradient(135deg, rgba(192,192,192,0.3), rgba(128,128,128,0.3)); border: 3px solid #c0c0c0;">
-      <button onclick="toggleSection('moon')" class="w-full p-4 flex items-center justify-between text-left">
+      <button onclick="toggleSection('moon'); playAudio('moon')" class="w-full p-4 flex items-center justify-between text-left">
        <div class="flex items-center gap-4">
         <span class="text-5xl float" style="animation-delay: 0.5s;">🌙</span> <span id="moon-title" class="text-2xl font-bold text-gray-200">The Moon</span>
        </div><span id="moon-arrow" class="text-3xl text-gray-200 transition-transform duration-300">▼</span> </button>
@@ -183,7 +183,7 @@
       </div>
      </div><!-- Our Solar System -->
      <div class="rounded-2xl overflow-hidden shadow-xl" style="background: linear-gradient(135deg, rgba(255,165,0,0.3), rgba(255,215,0,0.3)); border: 3px solid #ffa500;">
-      <button onclick="toggleSection('solar')" class="w-full p-4 flex items-center justify-between text-left">
+      <button onclick="toggleSection('solar'); playAudio('solar_system')" class="w-full p-4 flex items-center justify-between text-left">
        <div class="flex items-center gap-4">
         <span class="text-5xl float" style="animation-delay: 2.5s;">☀️</span> <span id="solar-system-title" class="text-2xl font-bold text-yellow-200">Our Solar System</span>
        </div><span id="solar-arrow" class="text-3xl text-yellow-200 transition-transform duration-300">▼</span> </button>
@@ -217,7 +217,7 @@
       </div>
      </div><!-- Planets -->
      <div class="rounded-2xl overflow-hidden shadow-xl" style="background: linear-gradient(135deg, rgba(147,112,219,0.3), rgba(138,43,226,0.3)); border: 3px solid #9370db;">
-      <button onclick="toggleSection('planets')" class="w-full p-4 flex items-center justify-between text-left">
+      <button onclick="toggleSection('planets'); playAudio('planets')" class="w-full p-4 flex items-center justify-between text-left">
        <div class="flex items-center gap-4">
         <span class="text-5xl float" style="animation-delay: 1s;">🪐</span> <span id="planets-title" class="text-2xl font-bold text-purple-200">The Planets</span>
        </div><span id="planets-arrow" class="text-3xl text-purple-200 transition-transform duration-300">▼</span> </button>
@@ -232,7 +232,7 @@
       </div>
      </div><!-- Stars -->
      <div class="rounded-2xl overflow-hidden shadow-xl" style="background: linear-gradient(135deg, rgba(255,215,0,0.3), rgba(255,255,224,0.3)); border: 3px solid #ffd700;">
-      <button onclick="toggleSection('stars')" class="w-full p-4 flex items-center justify-between text-left">
+      <button onclick="toggleSection('stars'); playAudio('stars')" class="w-full p-4 flex items-center justify-between text-left">
        <div class="flex items-center gap-4">
         <span class="text-5xl float" style="animation-delay: 1.5s;">⭐</span> <span id="stars-title" class="text-2xl font-bold text-yellow-200">Stars</span>
        </div><span id="stars-arrow" class="text-3xl text-yellow-200 transition-transform duration-300">▼</span> </button>
@@ -244,7 +244,7 @@
       </div>
      </div><!-- The Milky Way Galaxy -->
      <div class="rounded-2xl overflow-hidden shadow-xl" style="background: linear-gradient(135deg, rgba(139,69,19,0.3), rgba(160,82,45,0.3)); border: 3px solid #8b4513;">
-      <button onclick="toggleSection('galaxy')" class="w-full p-4 flex items-center justify-between text-left">
+      <button onclick="toggleSection('galaxy'); playAudio('galaxy')" class="w-full p-4 flex items-center justify-between text-left">
        <div class="flex items-center gap-4">
         <span class="text-5xl float" style="animation-delay: 3s;">🌌</span> <span id="galaxy-title" class="text-2xl font-bold text-orange-200">The Milky Way Galaxy</span>
        </div><span id="galaxy-arrow" class="text-3xl text-orange-200 transition-transform duration-300">▼</span> </button>
@@ -256,7 +256,7 @@
       </div>
      </div><!-- Eclipses -->
      <div class="rounded-2xl overflow-hidden shadow-xl" style="background: linear-gradient(135deg, rgba(100,100,100,0.3), rgba(80,80,80,0.3)); border: 3px solid #696969;">
-      <button onclick="toggleSection('eclipse')" class="w-full p-4 flex items-center justify-between text-left">
+      <button onclick="toggleSection('eclipse'); playAudio('eclipse')" class="w-full p-4 flex items-center justify-between text-left">
        <div class="flex items-center gap-4">
         <span class="text-5xl float" style="animation-delay: 3.5s;">🌑</span> <span id="eclipse-title" class="text-2xl font-bold text-gray-200">Eclipses</span>
        </div><span id="eclipse-arrow" class="text-3xl text-gray-200 transition-transform duration-300">▼</span> </button>
@@ -357,69 +357,74 @@
     <script>
     // Audio URLs for each section and language
     // Replace file paths with your actual audio file URLs
-    const audioUrls = {
-      "en-US": {
-        "sun": "sun-en.mp3",
-        "moon": "moon-en.mp3",
-        "planets": "planets-en.mp3",
-        "stars": "stars-en.mp3",
-        "solar_system": "solar_system-en.mp3",
-        "galaxy": "galaxy-en.mp3",
-        "eclipse": "eclipse-en.mp3"
-      },
-      "zh-CN": {
-        "sun": "sun-zh.mp3",
-        "moon": "moon-zh.mp3",
-        "planets": "planets-zh.mp3",
-        "stars": "stars-zh.mp3",
-        "solar_system": "solar_system-zh.mp3",
-        "galaxy": "galaxy-zh.mp3",
-        "eclipse": "eclipse-zh.mp3"
-      },
-      "th-TH": {
-        "sun": "sun-th.mp3",
-        "moon": "moon-th.mp3",
-        "planets": "planets-th.mp3",
-        "stars": "stars-th.mp3",
-        "solar_system": "solar_system-th.mp3",
-        "galaxy": "galaxy-th.mp3",
-        "eclipse": "eclipse-th.mp3"
-      },
-      "ja-JP": {
-        "sun": "sun-ja.mp3",
-        "moon": "moon-ja.mp3",
-        "planets": "planets-ja.mp3",
-        "stars": "stars-ja.mp3",
-        "solar_system": "solar_system-ja.mp3",
-        "galaxy": "galaxy-ja.mp3",
-        "eclipse": "eclipse-ja.mp3"
-      }
-    };
+// your existing code above
+
+
+/* ===========================
+   AUDIO SYSTEM — INSERT HERE
+   =========================== */
+
+let currentLanguage = "en";
 let currentAudio = null;
 
+const audioUrls = {
+  "en": {
+    "sun": "sun-en.mp3",
+    "moon": "moon-en.mp3",
+    "solar_system": "solar-en.mp3",
+    "planets": "planets-en.mp3",
+    "stars": "stars-en.mp3",
+    "galaxy": "galaxy-en.mp3",
+    "eclipse": "eclipse-en.mp3"
+  },
+  "th": {
+    "sun": "sun-th.mp3",
+    "moon": "moon-th.mp3",
+    "solar_system": "solar-th.mp3",
+    "planets": "planets-th.mp3",
+    "stars": "stars-th.mp3",
+    "galaxy": "galaxy-th.mp3",
+    "eclipse": "eclipse-th.mp3"
+  },
+  "zh": {
+    "sun": "sun-zh.mp3",
+    "moon": "moon-zh.mp3",
+    "solar_system": "solar-zh.mp3",
+    "planets": "planets-zh.mp3",
+    "stars": "stars-zh.mp3",
+    "galaxy": "galaxy-zh.mp3",
+    "eclipse": "eclipse-zh.mp3"
+  },
+  "ja": {
+    "sun": "sun-ja.mp3",
+    "moon": "moon-ja.mp3",
+    "solar_system": "solar-ja.mp3",
+    "planets": "planets-ja.mp3",
+    "stars": "stars-ja.mp3",
+    "galaxy": "galaxy-ja.mp3",
+    "eclipse": "eclipse-ja.mp3"
+  }
+};
+
 function playAudio(section) {
-  const langMap = {
-    en: "en-US",
-    th: "th-TH",
-    zh: "zh-CN",
-    ja: "ja-JP"
-  };
 
-  const fullLang = langMap[currentLanguage] || "en-US";
-
-  const audioPath = audioUrls[fullLang][section];
+  const audioPath = audioUrls[currentLanguage]?.[section];
 
   if (!audioPath) {
-    console.log("Audio not found:", section);
+    console.log("Audio not found:", section, currentLanguage);
     return;
   }
 
   if (currentAudio) {
     currentAudio.pause();
+    currentAudio.currentTime = 0;
   }
 
   currentAudio = new Audio(audioPath);
-  currentAudio.play();
+  currentAudio.play().catch(() => {});
+}
+
+</script>
 }
     // Language translations
     const translations = {
