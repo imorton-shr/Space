@@ -1,0 +1,1122 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Space Explorer Kids</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&amp;display=swap" rel="stylesheet"><!-- AUDIO FILES PLACEHOLDER
+    Add MP3 audio files for each section in each language.
+    Update the audioUrls object in the JavaScript below with your file paths.
+    
+    Example file structure:
+    /audio/en-US/sun.mp3
+    /audio/en-US/moon.mp3
+    /audio/en-US/planets.mp3
+    /audio/en-US/stars.mp3
+    /audio/en-US/solar_system.mp3
+    /audio/en-US/galaxy.mp3
+    /audio/en-US/eclipse.mp3
+    
+    /audio/zh-CN/sun.mp3
+    /audio/zh-CN/moon.mp3
+    ... (and so on for each language)
+    
+    /audio/th-TH/sun.mp3
+    /audio/th-TH/moon.mp3
+    ... (and so on for each language)
+    
+    /audio/ja-JP/sun.mp3
+    /audio/ja-JP/moon.mp3
+    ... (and so on for each language)
+  -->
+  <style>
+    * { font-family: 'Fredoka', sans-serif; }
+    
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    @keyframes rocket-hover {
+      0%, 100% { transform: translateY(0) rotate(-5deg); }
+      50% { transform: translateY(-15px) rotate(5deg); }
+    }
+    
+    .star {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle 2s ease-in-out infinite;
+    }
+    
+    .float { animation: float 3s ease-in-out infinite; }
+    .rocket-float { animation: rocket-hover 4s ease-in-out infinite; }
+    
+    .expandable-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease-out, padding 0.3s ease;
+    }
+    
+    .expandable-content.open {
+      max-height: 800px;
+      padding: 20px;
+    }
+    
+    .planet-btn {
+      transition: all 0.3s ease;
+    }
+    
+    .planet-btn:hover {
+      transform: scale(1.1);
+    }
+    
+    .game-star {
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .game-star:hover {
+      transform: scale(1.3);
+    }
+    
+    .lang-btn {
+      transition: all 0.2s ease;
+    }
+    
+    .lang-btn:hover {
+      transform: translateY(-2px);
+    }
+    
+    .lang-btn.active {
+      ring: 4px;
+      ring-color: #fbbf24;
+    }
+    
+    .quiz-option {
+      transition: all 0.3s ease;
+    }
+    
+    .quiz-option:hover {
+      transform: translateY(-2px);
+    }
+    
+    .quiz-option.selected {
+      ring: 3px;
+      ring-color: #fbbf24;
+    }
+  </style>
+  <style>body { box-sizing: border-box; }
+  .quiz-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  .quiz-modal.open {
+    display: flex;
+  }
+  .quiz-modal-content {
+    background: linear-gradient(135deg, rgba(15, 12, 41, 0.95), rgba(48, 43, 99, 0.95));
+    border: 3px solid #22c55e;
+    border-radius: 2rem;
+    padding: 2rem;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 0 40px rgba(34, 197, 94, 0.5);
+  }
+  </style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full overflow-auto">
+  <div id="app-wrapper" class="min-h-full w-full relative" style="background: linear-gradient(180deg, #0f0c29 0%, #302b63 50%, #24243e 100%);">
+   <!-- Stars Background -->
+   <div id="stars-container" class="absolute inset-0 overflow-hidden pointer-events-none"></div><!-- Language Buttons -->
+   <div class="relative z-10 flex justify-center gap-2 pt-4 pb-2 flex-wrap px-4">
+    <button onclick="setLanguage('en')" class="lang-btn px-4 py-2 rounded-full text-sm font-semibold shadow-lg active" id="lang-en" style="background: linear-gradient(135deg, #ff6b6b, #ff8e8e); color: white;"> 🇬🇧 English </button> <button onclick="setLanguage('th')" class="lang-btn px-4 py-2 rounded-full text-sm font-semibold shadow-lg" id="lang-th" style="background: linear-gradient(135deg, #4ecdc4, #6ee7df); color: white;"> 🇹🇭 ไทย </button> <button onclick="setLanguage('zh')" class="lang-btn px-4 py-2 rounded-full text-sm font-semibold shadow-lg" id="lang-zh" style="background: linear-gradient(135deg, #f7dc6f, #f9e79f); color: #333;"> 🇨🇳 中文 </button> <button onclick="setLanguage('ja')" class="lang-btn px-4 py-2 rounded-full text-sm font-semibold shadow-lg" id="lang-ja" style="background: linear-gradient(135deg, #bb8fce, #d7bde2); color: white;"> 🇯🇵 日本語 </button>
+   </div><!-- Main Content -->
+   <div class="relative z-10 max-w-4xl mx-auto px-4 pb-8">
+    <!-- Header -->
+    <header class="text-center py-6">
+     <div class="rocket-float inline-block text-7xl mb-4">
+      🚀
+     </div>
+     <h1 id="main-title" class="text-4xl md:text-5xl font-bold text-white mb-2" style="text-shadow: 0 0 20px rgba(255,255,255,0.5);">Space Explorer!</h1>
+     <p id="welcome-text" class="text-xl text-purple-200">Let's discover the amazing universe together! ✨</p>
+    </header><!-- Expandable Sections -->
+    <div class="space-y-4">
+     <!-- The Sun -->
+     <div class="rounded-2xl overflow-hidden shadow-xl" style="background: linear-gradient(135deg, rgba(255,165,0,0.3), rgba(255,69,0,0.3)); border: 3px solid #ffa500;">
+      <button onclick="toggleSection('sun')" class="w-full p-4 flex items-center justify-between text-left">
+       <div class="flex items-center gap-4">
+        <span class="text-5xl float">☀️</span> <span id="sun-title" class="text-2xl font-bold text-yellow-200">The Sun</span>
+       </div><span id="sun-arrow" class="text-3xl text-yellow-200 transition-transform duration-300">▼</span> </button>
+      <div id="sun-content" class="expandable-content bg-black/30">
+       <p id="sun-text" class="text-lg text-yellow-100 leading-relaxed">The Sun is a giant ball of hot, glowing gas! It gives us light and keeps us warm. The Sun is SO big that one million Earths could fit inside it! 🌟</p>
+       <div class="mt-4 p-4 rounded-xl bg-yellow-500/20">
+        <p id="sun-fact" class="text-yellow-200 font-semibold">⭐ Fun Fact: The Sun is about 4.6 billion years old!</p>
+       </div>
+      </div>
+     </div><!-- The Moon -->
+     <div class="rounded-2xl overflow-hidden shadow-xl" style="background: linear-gradient(135deg, rgba(192,192,192,0.3), rgba(128,128,128,0.3)); border: 3px solid #c0c0c0;">
+      <button onclick="toggleSection('moon')" class="w-full p-4 flex items-center justify-between text-left">
+       <div class="flex items-center gap-4">
+        <span class="text-5xl float" style="animation-delay: 0.5s;">🌙</span> <span id="moon-title" class="text-2xl font-bold text-gray-200">The Moon</span>
+       </div><span id="moon-arrow" class="text-3xl text-gray-200 transition-transform duration-300">▼</span> </button>
+      <div id="moon-content" class="expandable-content bg-black/30">
+       <p id="moon-text" class="text-lg text-gray-100 leading-relaxed">The Moon is Earth's best friend in space! It goes around our planet and changes shape in the sky. Sometimes it's round like a ball, and sometimes it looks like a banana! 🍌</p>
+       <div class="mt-4 p-4 rounded-xl bg-gray-500/20">
+        <p id="moon-fact" class="text-gray-200 font-semibold">🌕 Fun Fact: Astronauts have walked on the Moon!</p>
+       </div>
+      </div>
+     </div><!-- Our Solar System -->
+     <div class="rounded-2xl overflow-hidden shadow-xl" style="background: linear-gradient(135deg, rgba(255,165,0,0.3), rgba(255,215,0,0.3)); border: 3px solid #ffa500;">
+      <button onclick="toggleSection('solar')" class="w-full p-4 flex items-center justify-between text-left">
+       <div class="flex items-center gap-4">
+        <span class="text-5xl float" style="animation-delay: 2.5s;">☀️</span> <span id="solar-system-title" class="text-2xl font-bold text-yellow-200">Our Solar System</span>
+       </div><span id="solar-arrow" class="text-3xl text-yellow-200 transition-transform duration-300">▼</span> </button>
+      <div id="solar-content" class="expandable-content bg-black/30">
+       <p id="solar-system-text" class="text-lg text-yellow-100 leading-relaxed">The Solar System is our home in space! It consists of the Sun at the center with 8 planets, moons, and asteroids all orbiting around it. Everything in our Solar System is held together by the Sun's powerful gravity! ☀️</p><!-- Solar System Diagram -->
+       <div class="mt-6 mb-6 flex justify-center">
+        <svg width="300" height="300" viewbox="0 0 300 300" class="solar-system-diagram"><!-- Orbital paths --> <circle cx="150" cy="150" r="40" fill="none" stroke="#ffa50044" stroke-width="1" stroke-dasharray="2,2" /> <circle cx="150" cy="150" r="70" fill="none" stroke="#ffa50044" stroke-width="1" stroke-dasharray="2,2" /> <circle cx="150" cy="150" r="100" fill="none" stroke="#ffa50044" stroke-width="1" stroke-dasharray="2,2" /> <circle cx="150" cy="150" r="130" fill="none" stroke="#ffa50044" stroke-width="1" stroke-dasharray="2,2" /> <!-- Sun --> <text x="150" y="160" text-anchor="middle" font-size="28">
+          ☀️
+         </text> <!-- Mercury --> <text x="190" y="160" text-anchor="middle" font-size="14">
+          🟠
+         </text> <!-- Venus --> <text x="150" y="230" text-anchor="middle" font-size="18">
+          🟡
+         </text> <!-- Earth --> <text x="60" y="160" text-anchor="middle" font-size="18">
+          🌍
+         </text> <!-- Mars --> <text x="150" y="80" text-anchor="middle" font-size="16">
+          🔴
+         </text> <!-- Jupiter --> <text x="280" y="160" text-anchor="middle" font-size="22">
+          🟤
+         </text> <!-- Saturn --> <text x="150" y="20" text-anchor="middle" font-size="20">
+          🪐
+         </text> <!-- Uranus --> <text x="20" y="160" text-anchor="middle" font-size="18">
+          🔵
+         </text> <!-- Neptune --> <text x="150" y="290" text-anchor="middle" font-size="18">
+          🔷
+         </text>
+        </svg>
+       </div>
+       <div class="mt-4 p-4 rounded-xl bg-yellow-500/20">
+        <p id="solar-system-fact" class="text-yellow-200 font-semibold">🌍 Fun Fact: It takes Earth 365 days (one year) to orbit completely around the Sun!</p>
+       </div>
+      </div>
+     </div><!-- Planets -->
+     <div class="rounded-2xl overflow-hidden shadow-xl" style="background: linear-gradient(135deg, rgba(147,112,219,0.3), rgba(138,43,226,0.3)); border: 3px solid #9370db;">
+      <button onclick="toggleSection('planets')" class="w-full p-4 flex items-center justify-between text-left">
+       <div class="flex items-center gap-4">
+        <span class="text-5xl float" style="animation-delay: 1s;">🪐</span> <span id="planets-title" class="text-2xl font-bold text-purple-200">The Planets</span>
+       </div><span id="planets-arrow" class="text-3xl text-purple-200 transition-transform duration-300">▼</span> </button>
+      <div id="planets-content" class="expandable-content bg-black/30">
+       <p id="planets-text" class="text-lg text-purple-100 leading-relaxed mb-4">There are 8 planets in our solar system! They all go around the Sun. Can you learn their names?</p>
+       <div class="grid grid-cols-4 gap-3">
+        <button onclick="showPlanetInfo('mercury')" class="planet-btn p-3 rounded-xl bg-orange-600/50 text-center"> <span class="text-3xl block">🟠</span> <span id="mercury-name" class="text-sm text-white">Mercury</span> </button> <button onclick="showPlanetInfo('venus')" class="planet-btn p-3 rounded-xl bg-yellow-600/50 text-center"> <span class="text-3xl block">🟡</span> <span id="venus-name" class="text-sm text-white">Venus</span> </button> <button onclick="showPlanetInfo('earth')" class="planet-btn p-3 rounded-xl bg-blue-600/50 text-center"> <span class="text-3xl block">🌍</span> <span id="earth-name" class="text-sm text-white">Earth</span> </button> <button onclick="showPlanetInfo('mars')" class="planet-btn p-3 rounded-xl bg-red-600/50 text-center"> <span class="text-3xl block">🔴</span> <span id="mars-name" class="text-sm text-white">Mars</span> </button> <button onclick="showPlanetInfo('jupiter')" class="planet-btn p-3 rounded-xl bg-orange-400/50 text-center"> <span class="text-3xl block">🟤</span> <span id="jupiter-name" class="text-sm text-white">Jupiter</span> </button> <button onclick="showPlanetInfo('saturn')" class="planet-btn p-3 rounded-xl bg-yellow-500/50 text-center"> <span class="text-3xl block">🪐</span> <span id="saturn-name" class="text-sm text-white">Saturn</span> </button> <button onclick="showPlanetInfo('uranus')" class="planet-btn p-3 rounded-xl bg-cyan-500/50 text-center"> <span class="text-3xl block">🔵</span> <span id="uranus-name" class="text-sm text-white">Uranus</span> </button> <button onclick="showPlanetInfo('neptune')" class="planet-btn p-3 rounded-xl bg-blue-800/50 text-center"> <span class="text-3xl block">🔷</span> <span id="neptune-name" class="text-sm text-white">Neptune</span> </button>
+       </div>
+       <div id="planet-info" class="mt-4 p-4 rounded-xl bg-purple-500/20 hidden">
+        <p id="planet-info-text" class="text-purple-100 font-semibold text-center"></p>
+       </div>
+      </div>
+     </div><!-- Stars -->
+     <div class="rounded-2xl overflow-hidden shadow-xl" style="background: linear-gradient(135deg, rgba(255,215,0,0.3), rgba(255,255,224,0.3)); border: 3px solid #ffd700;">
+      <button onclick="toggleSection('stars')" class="w-full p-4 flex items-center justify-between text-left">
+       <div class="flex items-center gap-4">
+        <span class="text-5xl float" style="animation-delay: 1.5s;">⭐</span> <span id="stars-title" class="text-2xl font-bold text-yellow-200">Stars</span>
+       </div><span id="stars-arrow" class="text-3xl text-yellow-200 transition-transform duration-300">▼</span> </button>
+      <div id="stars-content" class="expandable-content bg-black/30">
+       <p id="stars-text" class="text-lg text-yellow-100 leading-relaxed">Stars are like tiny sparkles in the night sky! They are actually giant balls of fire, just like our Sun. There are more stars in space than grains of sand on all the beaches! 🏖️</p>
+       <div class="mt-4 p-4 rounded-xl bg-yellow-500/20">
+        <p id="stars-fact" class="text-yellow-200 font-semibold">✨ Fun Fact: The closest star to Earth (after the Sun) is called Proxima Centauri!</p>
+       </div>
+      </div>
+     </div><!-- The Milky Way Galaxy -->
+     <div class="rounded-2xl overflow-hidden shadow-xl" style="background: linear-gradient(135deg, rgba(139,69,19,0.3), rgba(160,82,45,0.3)); border: 3px solid #8b4513;">
+      <button onclick="toggleSection('galaxy')" class="w-full p-4 flex items-center justify-between text-left">
+       <div class="flex items-center gap-4">
+        <span class="text-5xl float" style="animation-delay: 3s;">🌌</span> <span id="galaxy-title" class="text-2xl font-bold text-orange-200">The Milky Way Galaxy</span>
+       </div><span id="galaxy-arrow" class="text-3xl text-orange-200 transition-transform duration-300">▼</span> </button>
+      <div id="galaxy-content" class="expandable-content bg-black/30">
+       <p id="galaxy-text" class="text-lg text-orange-100 leading-relaxed">Our Solar System lives inside a huge galaxy called the Milky Way! A galaxy is like a giant family of billions and billions of stars held together by gravity. The Milky Way is so big that light takes 100,000 years to travel from one side to the other! 🌌</p>
+       <div class="mt-4 p-4 rounded-xl bg-orange-500/20">
+        <p id="galaxy-fact" class="text-orange-200 font-semibold">✨ Fun Fact: The Milky Way has over 200 BILLION stars in it!</p>
+       </div>
+      </div>
+     </div><!-- Eclipses -->
+     <div class="rounded-2xl overflow-hidden shadow-xl" style="background: linear-gradient(135deg, rgba(100,100,100,0.3), rgba(80,80,80,0.3)); border: 3px solid #696969;">
+      <button onclick="toggleSection('eclipse')" class="w-full p-4 flex items-center justify-between text-left">
+       <div class="flex items-center gap-4">
+        <span class="text-5xl float" style="animation-delay: 3.5s;">🌑</span> <span id="eclipse-title" class="text-2xl font-bold text-gray-200">Eclipses</span>
+       </div><span id="eclipse-arrow" class="text-3xl text-gray-200 transition-transform duration-300">▼</span> </button>
+      <div id="eclipse-content" class="expandable-content bg-black/30">
+       <p id="eclipse-text" class="text-lg text-gray-100 leading-relaxed">An eclipse happens when the Moon or Earth block sunlight! During a solar eclipse, the Moon moves in front of the Sun and creates a shadow on Earth. During a lunar eclipse, Earth moves between the Sun and Moon, and Earth's shadow falls on the Moon, making it look reddish! 🌙</p><!-- Solar Eclipse Diagram -->
+       <div class="mt-6 mb-6">
+        <h4 class="text-lg font-bold text-gray-200 mb-3">☀️ Solar Eclipse</h4>
+        <svg width="100%" height="150" viewbox="0 0 400 150" class="eclipse-diagram">
+         <!-- Sun --> <circle cx="50" cy="75" r="25" fill="#fbbf24" opacity="0.8" /> <!-- Moon in front (white) --> <circle cx="200" cy="75" r="20" fill="#ffffff" /> <!-- Shadow on Earth --> <circle cx="320" cy="75" r="35" fill="#1e40af" opacity="0.6" stroke="#60a5fa" stroke-width="2" /> <!-- Labels --> <text x="50" y="130" text-anchor="middle" class="text-xs fill-yellow-200" font-size="12">
+          ☀️ Sun
+         </text> <text x="200" y="130" text-anchor="middle" class="text-xs fill-gray-300" font-size="12">
+          🌙 Moon
+         </text> <text x="320" y="130" text-anchor="middle" class="text-xs fill-blue-200" font-size="12">
+          🌍 Earth
+         </text> <!-- Shadow rays --> <line x1="220" y1="55" x2="290" y2="40" stroke="#fbbf24" stroke-width="1" stroke-dasharray="3,3" opacity="0.5" /> <line x1="220" y1="95" x2="290" y2="110" stroke="#fbbf24" stroke-width="1" stroke-dasharray="3,3" opacity="0.5" />
+        </svg>
+        <p class="text-sm text-gray-300 mt-2">The Moon passes in front of the Sun, blocking its light and creating a shadow on Earth!</p>
+       </div><!-- Lunar Eclipse Diagram -->
+       <div class="mt-6 mb-6">
+        <h4 class="text-lg font-bold text-gray-200 mb-3">🌙 Lunar Eclipse</h4>
+        <svg width="100%" height="150" viewbox="0 0 400 150" class="eclipse-diagram">
+         <!-- Sun --> <circle cx="50" cy="75" r="25" fill="#fbbf24" opacity="0.8" /> <!-- Earth in middle --> <circle cx="200" cy="75" r="30" fill="#3b82f6" stroke="#60a5fa" stroke-width="2" /> <!-- Moon in shadow (grey) --> <circle cx="320" cy="75" r="18" fill="#a0a0a0" opacity="0.9" stroke="#808080" stroke-width="2" /> <!-- Shadow rays from earth to moon --> <line x1="230" y1="55" x2="302" y2="57" stroke="#fbbf24" stroke-width="1" stroke-dasharray="3,3" opacity="0.5" /> <line x1="230" y1="95" x2="302" y2="93" stroke="#fbbf24" stroke-width="1" stroke-dasharray="3,3" opacity="0.5" /> <!-- Labels --> <text x="50" y="130" text-anchor="middle" class="text-xs fill-yellow-200" font-size="12">
+          ☀️ Sun
+         </text> <text x="200" y="130" text-anchor="middle" class="text-xs fill-blue-200" font-size="12">
+          🌍 Earth
+         </text> <text x="320" y="130" text-anchor="middle" class="text-xs fill-gray-300" font-size="12">
+          🌙 Moon
+         </text>
+        </svg>
+        <p class="text-sm text-gray-300 mt-2">Earth passes between the Sun and Moon, casting Earth's shadow on the Moon and making it look red!</p>
+       </div>
+       <div class="mt-4 p-4 rounded-xl bg-gray-500/20">
+        <p id="eclipse-fact" class="text-gray-200 font-semibold">🔭 Fun Fact: You should never look directly at the Sun during a solar eclipse without special eclipse glasses!</p>
+       </div>
+      </div>
+     </div><!-- Mini Games Section -->
+     <div class="rounded-2xl overflow-hidden shadow-xl" style="background: linear-gradient(135deg, rgba(34,197,94,0.3), rgba(74,222,128,0.3)); border: 3px solid #22c55e;">
+      <button onclick="toggleSection('games')" class="w-full p-4 flex items-center justify-between text-left">
+       <div class="flex items-center gap-4">
+        <span class="text-5xl float" style="animation-delay: 2s;">🎮</span> <span id="games-title" class="text-2xl font-bold text-green-200">Mini Games!</span>
+       </div><span id="games-arrow" class="text-3xl text-green-200 transition-transform duration-300">▼</span> </button>
+      <div id="games-content" class="expandable-content bg-black/30">
+       <!-- Game 1: Star Catcher -->
+       <div class="mb-6">
+        <h3 id="game1-title" class="text-xl font-bold text-green-200 mb-3">🌟 Star Catcher Game</h3>
+        <p id="game1-desc" class="text-green-100 mb-3">Click on the stars to catch them! How many can you get in 10 seconds?</p>
+        <div id="star-game-area" class="relative h-48 bg-indigo-900/50 rounded-xl overflow-hidden mb-3">
+         <div id="star-game-display" class="absolute inset-0 flex items-center justify-center">
+          <button onclick="startStarGame()" id="start-star-game" class="px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-full text-lg transition-all"> <span id="start-game-text">Start Game!</span> </button>
+         </div>
+        </div>
+        <div class="flex justify-between text-green-200">
+         <span><span id="score-label">Score</span>: <span id="star-score">0</span></span> <span><span id="time-label">Time</span>: <span id="star-time">10</span>s</span>
+        </div>
+       </div><!-- Game 2: Planet Memory -->
+       <div class="mb-6">
+        <h3 id="game2-title" class="text-xl font-bold text-green-200 mb-3">🧠 Planet Memory Game</h3>
+        <p id="game2-desc" class="text-green-100 mb-3">Match the planets! Click two cards to find matching pairs.</p>
+        <div id="memory-game" class="grid grid-cols-4 gap-2 mb-3">
+         <!-- Cards will be generated by JS -->
+        </div>
+        <div class="flex justify-between items-center">
+         <span class="text-green-200"><span id="pairs-label">Pairs Found</span>: <span id="pairs-found">0</span>/4</span> <button onclick="resetMemoryGame()" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-bold rounded-full transition-all"> <span id="reset-text">Reset</span> </button>
+        </div>
+       </div>
+      </div>
+     </div><!-- Planet Quiz Section -->
+     <div class="rounded-2xl overflow-hidden shadow-xl" style="background: linear-gradient(135deg, rgba(34,197,94,0.3), rgba(74,222,128,0.3)); border: 3px solid #22c55e;">
+      <button onclick="toggleSection('quiz')" class="w-full p-4 flex items-center justify-between text-left">
+       <div class="flex items-center gap-4">
+        <span class="text-5xl float" style="animation-delay: 3.5s;">🌟</span> <span id="quiz-section-title" class="text-2xl font-bold text-green-200">Planet Quiz!</span>
+       </div><span id="quiz-section-arrow" class="text-3xl text-green-200 transition-transform duration-300">▼</span> </button>
+      <div id="quiz-content" class="expandable-content bg-black/30">
+       <p id="quiz-section-desc" class="text-green-100 mb-4">Answer quiz questions about space! Test your knowledge!</p><button onclick="openQuizPopup()" class="w-full px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-full text-lg transition-all mb-4"> <span id="open-quiz-text">Open Quiz!</span> </button>
+       <div class="flex justify-between items-center">
+        <span class="text-green-200"><span id="quiz-section-score-label">Score</span>: <span id="quiz-score">0</span>/5</span> <button onclick="resetQuizGame()" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-bold rounded-full transition-all"> <span id="quiz-section-reset-text">Reset</span> </button>
+       </div>
+      </div>
+     </div><!-- Footer -->
+     <footer class="text-center py-6 mt-8">
+      <p id="footer-text" class="text-purple-300 text-lg">Keep exploring the universe! You're an amazing Space Explorer! 🌌</p>
+      <div class="text-4xl mt-4 space-x-2">
+       <span class="float inline-block">👨‍🚀</span> <span class="float inline-block" style="animation-delay: 0.3s;">👩‍🚀</span> <span class="float inline-block" style="animation-delay: 0.6s;">🛸</span> <span class="float inline-block" style="animation-delay: 0.9s;">🌎</span> <span class="float inline-block" style="animation-delay: 1.2s;">🌟</span>
+      </div>
+     </footer>
+    </div><!-- Quiz Modal Popup -->
+    <div id="quiz-modal" class="quiz-modal">
+     <div class="quiz-modal-content">
+      <div class="flex justify-between items-center mb-4">
+       <h2 class="text-2xl font-bold text-green-200">🌟 Planet Quiz</h2><button onclick="closeQuizPopup()" class="text-2xl text-green-200 hover:text-green-100">✕</button>
+      </div>
+      <div id="quiz-popup-content"></div>
+      <div class="flex justify-between items-center mt-6 pt-4 border-t border-green-500/30">
+       <span class="text-green-200 font-semibold"><span id="quiz-popup-score-label">Score</span>: <span id="quiz-popup-score">0</span>/5</span> <button onclick="resetQuizPopup()" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-bold rounded-full transition-all"> <span id="quiz-popup-reset-text">Reset</span> </button>
+      </div>
+     </div>
+    </div>
+    <script>
+    // Audio URLs for each section and language
+    // Replace file paths with your actual audio file URLs
+    const audioUrls = {
+      "en-US": {
+        "sun": "sun-en.mp3",
+        "moon": "moon-en.mp3",
+        "planets": "planets-en.mp3",
+        "stars": "stars-en.mp3",
+        "solar_system": "solar_system-en.mp3",
+        "galaxy": "galaxy-en.mp3",
+        "eclipse": "eclipse-en.mp3"
+      },
+      "zh-CN": {
+        "sun": "sun-zh.mp3",
+        "moon": "moon-zh.mp3",
+        "planets": "planets-zh.mp3",
+        "stars": "stars-zh.mp3",
+        "solar_system": "solar_system-zh.mp3",
+        "galaxy": "galaxy-zh.mp3",
+        "eclipse": "eclipse-zh.mp3"
+      },
+      "th-TH": {
+        "sun": "sun-th.mp3",
+        "moon": "moon-th.mp3",
+        "planets": "planets-th.mp3",
+        "stars": "stars-th.mp3",
+        "solar_system": "solar_system-th.mp3",
+        "galaxy": "galaxy-th.mp3",
+        "eclipse": "eclipse-th.mp3"
+      },
+      "ja-JP": {
+        "sun": "sun-ja.mp3",
+        "moon": "moon-ja.mp3",
+        "planets": "planets-ja.mp3",
+        "stars": "stars-ja.mp3",
+        "solar_system": "solar_system-ja.mp3",
+        "galaxy": "galaxy-ja.mp3",
+        "eclipse": "eclipse-ja.mp3"
+      }
+    };
+
+    // Language translations
+    const translations = {
+      en: {
+        mainTitle: "Space Explorer!",
+        welcomeText: "Let's go on a space adventure! ✨",
+        sunTitle: "The Sun",
+        sunText: "The Sun is a big, hot, glowing ball! It makes light and keeps us warm. The Sun is SO big - one million Earths could fit inside! 🌟",
+        sunFact: "⭐ Fun Fact: The Sun is very, very old!",
+        moonTitle: "The Moon",
+        moonText: "The Moon is Earth's friend in space! It goes around our planet. Sometimes it looks round like a ball, and sometimes like a banana! 🍌",
+        moonFact: "🌕 Fun Fact: People have walked on the Moon!",
+        planetsTitle: "The Planets",
+        planetsText: "There are 8 planets! They all go around the Sun. Can you learn their names?",
+        starsTitle: "Stars",
+        starsText: "Stars are tiny sparkles in the night sky! They are like little suns. There are SO many stars - more than sand on the beach! 🏖️",
+        starsFact: "✨ Fun Fact: The closest star is called Proxima Centauri!",
+        gamesTitle: "Mini Games!",
+        game1Title: "🌟 Star Catcher Game",
+        game1Desc: "Click the stars! How many can you get in 10 seconds?",
+        startGameText: "Start Game!",
+        scoreLabel: "Score",
+        timeLabel: "Time",
+        game2Title: "🧠 Planet Memory Game",
+        game2Desc: "Match the planets! Click two cards to find pairs.",
+        pairsLabel: "Pairs Found",
+        resetText: "Reset",
+        game3Title: "🌟 Planet Quiz!",
+        game3Desc: "Answer space questions! See how much you know!",
+        startQuizText: "Open Quiz!",
+        quizScoreLabel: "Score",
+        quizResetText: "Reset",
+        footerText: "Keep exploring! You're awesome! 🌌",
+        planets: {
+          mercury: "Mercury",
+          venus: "Venus",
+          earth: "Earth",
+          mars: "Mars",
+          jupiter: "Jupiter",
+          saturn: "Saturn",
+          uranus: "Uranus",
+          neptune: "Neptune"
+        },
+        planetInfo: {
+          mercury: "🟠 Mercury is the smallest planet!",
+          venus: "🟡 Venus is very hot!",
+          earth: "🌍 Earth is our home!",
+          mars: "🔴 Mars is the Red Planet!",
+          jupiter: "🟤 Jupiter is the biggest planet!",
+          saturn: "🪐 Saturn has beautiful rings!",
+          uranus: "🔵 Uranus spins on its side!",
+          neptune: "🔷 Neptune is very cold and far away!"
+        },
+        quizQuestions: [
+          { q: "What is closest to the Sun?", a: 0, opts: ["Mercury", "Venus", "Earth", "Mars"] },
+          { q: "Which planet has rings?", a: 2, opts: ["Jupiter", "Mars", "Saturn", "Neptune"] },
+          { q: "How many planets?", a: 2, opts: ["6", "7", "8", "9"] },
+          { q: "What color is Mars?", a: 2, opts: ["Blue", "Yellow", "Red", "Green"] },
+          { q: "Which is the biggest?", a: 0, opts: ["Jupiter", "Saturn", "Neptune", "Earth"] }
+        ],
+        solarSystemTitle: "Our Solar System",
+        solarSystemText: "Our Solar System has a Sun with 8 planets, moons, and rocks! Everything goes around the Sun. The Sun keeps them all together! ☀️",
+        solarSystemFact: "🌍 Fun Fact: It takes Earth 365 days to go around the Sun!",
+        galaxyTitle: "The Milky Way Galaxy",
+        galaxyText: "Our Solar System is in a galaxy called the Milky Way! A galaxy is like a big family of stars. The Milky Way has SO many stars! 🌌",
+        galaxyFact: "✨ Fun Fact: The Milky Way has over 200 BILLION stars!",
+        eclipseTitle: "Eclipses",
+        eclipseText: "An eclipse is when the Moon or Earth block the Sun's light! It's like a shadow game in space! 🌙",
+        eclipseFact: "🔭 Fun Fact: Never look at the Sun during an eclipse!"
+      },
+      th: {
+        mainTitle: "นักสำรวจอวกาศ!",
+        welcomeText: "มาค้นพบจักรวาลมหัศจรรย์ด้วยกันเถอะ! ✨",
+        sunTitle: "ดวงอาทิตย์",
+        sunText: "ดวงอาทิตย์เป็นลูกบอลก๊าซร้อนยักษ์ที่เปล่งแสง! มันให้แสงสว่างและความอบอุ่นแก่เรา ดวงอาทิตย์ใหญ่มากจนโลกล้านดวงสามารถอยู่ข้างในได้! 🌟",
+        sunFact: "⭐ เกร็ดความรู้: ดวงอาทิตย์มีอายุประมาณ 4,600 ล้านปี!",
+        moonTitle: "ดวงจันทร์",
+        moonText: "ดวงจันทร์เป็นเพื่อนที่ดีที่สุดของโลกในอวกาศ! มันโคจรรอบโลกและเปลี่ยนรูปร่างบนท้องฟ้า บางครั้งกลมเหมือนลูกบอล บางครั้งก็ดูเหมือนกล้วย! 🍌",
+        moonFact: "🌕 เกร็ดความรู้: นักบินอวกาศเคยเดินบนดวงจันทร์แล้ว!",
+        planetsTitle: "ดาวเคราะห์",
+        planetsText: "มีดาวเคราะห์ 8 ดวงในระบบสุริยะของเรา! ทุกดวงโคจรรอบดวงอาทิตย์ คุณจำชื่อพวกมันได้ไหม?",
+        starsTitle: "ดวงดาว",
+        starsText: "ดวงดาวเหมือนประกายเล็กๆ บนท้องฟ้ายามค่ำคืน! จริงๆ แล้วมันเป็นลูกไฟยักษ์เหมือนดวงอาทิตย์ของเรา มีดวงดาวในอวกาศมากกว่าเม็ดทรายบนชายหาดทุกแห่ง! 🏖️",
+        starsFact: "✨ เกร็ดความรู้: ดาวที่ใกล้โลกที่สุด (หลังจากดวงอาทิตย์) ชื่อ พร็อกซิมา เซนทอรี!",
+        gamesTitle: "เกมมินิ!",
+        game1Title: "🌟 เกมจับดาว",
+        game1Desc: "คลิกที่ดวงดาวเพื่อจับมัน! คุณจับได้กี่ดวงใน 10 วินาที?",
+        startGameText: "เริ่มเกม!",
+        scoreLabel: "คะแนน",
+        timeLabel: "เวลา",
+        game2Title: "🧠 เกมจับคู่ดาวเคราะห์",
+        game2Desc: "จับคู่ดาวเคราะห์! คลิกสองการ์ดเพื่อหาคู่ที่ตรงกัน",
+        pairsLabel: "คู่ที่พบ",
+        resetText: "เริ่มใหม่",
+        game3Title: "🌟 แบบทดสอบดาวเคราะห์!",
+        game3Desc: "ตอบคำถามแบบทดสอบเกี่ยวกับอวกาศ! ทดสอบความรู้ของคุณ!",
+        startQuizText: "เปิดแบบทดสอบ!",
+        quizScoreLabel: "คะแนน",
+        quizResetText: "เริ่มใหม่",
+        footerText: "สำรวจจักรวาลต่อไป! คุณเป็นนักสำรวจอวกาศที่เยี่ยมมาก! 🌌",
+        planets: {
+          mercury: "ดาวพุธ",
+          venus: "ดาวศุกร์",
+          earth: "โลก",
+          mars: "ดาวอังคาร",
+          jupiter: "ดาวพฤหัส",
+          saturn: "ดาวเสาร์",
+          uranus: "ดาวยูเรนัส",
+          neptune: "ดาวเนปจูน"
+        },
+        planetInfo: {
+          mercury: "🟠 ดาวพุธเป็นดาวเคราะห์ที่เล็กที่สุดและใกล้ดวงอาทิตย์ที่สุด!",
+          venus: "🟡 ดาวศุกร์เป็นดาวเคราะห์ที่ร้อนที่สุด - ร้อนกว่าดาวพุธด้วย!",
+          earth: "🌍 โลกคือบ้านของเรา! มีน้ำและอากาศให้เราอยู่",
+          mars: "🔴 ดาวอังคารเรียกว่าดาวแดง หุ่นยนต์สำรวจมัน!",
+          jupiter: "🟤 ดาวพฤหัสเป็นดาวเคราะห์ที่ใหญ่ที่สุด มีพายุยักษ์!",
+          saturn: "🪐 ดาวเสาร์มีวงแหวนสวยงามทำจากน้ำแข็งและหิน!",
+          uranus: "🔵 ดาวยูเรนัสหมุนตะแคงเหมือนลูกบอลกลิ้ง!",
+          neptune: "🔷 ดาวเนปจูนอยู่ไกลมากและหนาวและมีลมแรงมาก!"
+        },
+        quizQuestions: [
+          { q: "ดาวเคราะห์ใดใกล้ดวงอาทิตย์ที่สุด?", a: 0, opts: ["ดาวพุธ", "ดาวศุกร์", "โลก", "ดาวอังคาร"] },
+          { q: "ดาวเคราะห์ใดมีวงแหวนสวยงาม?", a: 2, opts: ["ดาวพฤหัส", "ดาวอังคาร", "ดาวเสาร์", "ดาวเนปจูน"] },
+          { q: "มีดาวเคราะห์กี่ดวงในระบบสุริยะของเรา?", a: 2, opts: ["6", "7", "8", "9"] },
+          { q: "ดาวอังคารเรียกว่า?", a: 2, opts: ["ดาวสีฟ้า", "ดาวสีเหลือง", "ดาวสีแดง", "ดาวสีเขียว"] },
+          { q: "ดาวเคราะห์ที่ใหญ่ที่สุดคือ?", a: 0, opts: ["ดาวพฤหัส", "ดาวเสาร์", "ดาวเนปจูน", "โลก"] }
+        ],
+        solarSystemTitle: "ระบบสุริยะของเรา",
+        solarSystemText: "ระบบสุริยะเป็นบ้านของเราในอวกาศ! มันประกอบด้วยดวงอาทิตย์ตรงกลางกับดาวเคราะห์ 8 ดวง ดวงจันทร์ และดาวเคราะห์น้อยทั้งหมดโคจรรอบดวงอาทิตย์ ทุกอย่างในระบบสุริยะถูกยึดไว้ด้วยแรงโน้มถ่วงของดวงอาทิตย์ที่มีพลัง! ☀️",
+        solarSystemFact: "🌍 เกร็ดความรู้: โลกใช้เวลา 365 วัน (1 ปี) เพื่อโคจรรอบดวงอาทิตย์ครบหนึ่งรอบ!",
+        galaxyTitle: "ชนวนทางช้างเผือก",
+        galaxyText: "ระบบสุริยะของเราอยู่ในกาแลกซี่ขนาดใหญ่ที่เรียกว่าชนวนทางช้างเผือก! กาแลกซี่เป็นครอบครัวยักษ์ของดาวนับพันล้าน ถูกยึดไว้ด้วยแรงโน้มถ่วง ชนวนทางช้างเผือกใหญ่มากจนแสงใช้เวลา 100,000 ปีในการเดินทางจากด้านหนึ่งไปอีกด้านหนึ่ง! 🌌",
+        galaxyFact: "✨ เกร็ดความรู้: ชนวนทางช้างเผือกมีดาวมากกว่า 200 พันล้านดวง!",
+        eclipseTitle: "日食と月食",
+        eclipseText: "日食と月食は、月または地球が太陽の光を遮るときに起こります。太陽日食の間、月は太陽の前に移動し、地球に影を作ります。月食の間、地球は太陽と月の間に位置し、地球の影が月に落ち、月が赤く見えます！🌙",
+        eclipseFact: "🔭 เกร็ดความรู้: คุณไม่ควรมองดวงอาทิตย์โดยตรงระหว่างการเกิดสุริยุปราคาโดยไม่ใช้แว่นตาพิเศษ!"
+      },
+      zh: {
+        mainTitle: "太空探险家！",
+        welcomeText: "让我们一起探索奇妙的宇宙吧！✨",
+        sunTitle: "太阳",
+        sunText: "太阳是一个巨大的炽热发光气体球！它给我们光明和温暖。太阳非常大，可以装下一百万个地球！🌟",
+        sunFact: "⭐ 趣味知识：太阳大约有46亿年的历史！",
+        moonTitle: "月亮",
+        moonText: "月亮是地球在太空中最好的朋友！它绕着我们的星球转，在天空中变换形状。有时候圆圆的像球，有时候看起来像香蕉！🍌",
+        moonFact: "🌕 趣味知识：宇航员曾经在月球上行走过！",
+        planetsTitle: "行星",
+        planetsText: "我们的太阳系有8颗行星！它们都绕着太阳转。你能记住它们的名字吗？",
+        starsTitle: "星星",
+        starsText: "星星就像夜空中的小亮点！它们其实是巨大的火球，就像我们的太阳一样。太空中的星星比所有海滩上的沙粒还要多！🏖️",
+        starsFact: "✨ 趣味知识：离地球最近的恒星（除了太阳）叫做比邻星！",
+        gamesTitle: "小游戏！",
+        game1Title: "🌟 捕星游戏",
+        game1Desc: "点击星星来捕捉它们！10秒内你能捕到多少颗？",
+        startGameText: "开始游戏！",
+        scoreLabel: "分数",
+        timeLabel: "时间",
+        game2Title: "🧠 行星记忆游戏",
+        game2Desc: "匹配行星！点击两张卡片找到匹配的对子。",
+        pairsLabel: "找到的对子",
+        resetText: "重置",
+        game3Title: "🌟 行星测验！",
+        game3Desc: "回答有关太空的测验问题！测试你的知识！",
+        startQuizText: "打开测验！",
+        quizScoreLabel: "得分",
+        quizResetText: "重置",
+        footerText: "继续探索宇宙吧！你是一个了不起的太空探险家！🌌",
+        planets: {
+          mercury: "水星",
+          venus: "金星",
+          earth: "地球",
+          mars: "火星",
+          jupiter: "木星",
+          saturn: "土星",
+          uranus: "天王星",
+          neptune: "海王星"
+        },
+        planetInfo: {
+          mercury: "🟠 水星是最小的行星，也是离太阳最近的！",
+          venus: "🟡 金星是最热的行星 - 比水星还热！",
+          earth: "🌍 地球是我们的家！有水和空气让我们生活。",
+          mars: "🔴 火星被称为红色星球。机器人在探索它！",
+          jupiter: "🟤 木星是最大的行星。它有一个巨大的风暴！",
+          saturn: "🪐 土星有由冰和岩石组成的美丽光环！",
+          uranus: "🔵 天王星像滚动的球一样侧着转！",
+          neptune: "🔷 海王星非常遥远，非常寒冷，风很大！"
+        },
+        quizQuestions: [
+          { q: "哪颗行星离太阳最近？", a: 0, opts: ["水星", "金星", "地球", "火星"] },
+          { q: "哪颗行星有美丽的光环？", a: 2, opts: ["木星", "火星", "土星", "海王星"] },
+          { q: "我们太阳系有多少颗行星？", a: 2, opts: ["6", "7", "8", "9"] },
+          { q: "火星叫什么？", a: 2, opts: ["蓝色星球", "黄色星球", "红色星球", "绿色星球"] },
+          { q: "最大的行星是什么？", a: 0, opts: ["木星", "土星", "海王星", "地球"] }
+        ],
+        solarSystemTitle: "我们的太阳系",
+        solarSystemText: "太阳系是我们在太空中的家！它由中心的太阳和8颗行星、月亮和小行星组成，所有这些都绕着太阳公转。我们太阳系中的一切都被太阳强大的重力束缚在一起！☀️",
+        solarSystemFact: "🌍 趣味知识：地球需要365天（一年）才能完全绕太阳公转一周！",
+        galaxyTitle: "银河系",
+        galaxyText: "我们的太阳系生活在一个叫做银河系的巨大星系中！星系就像由重力聚集在一起的数十亿颗星星组成的大家族。银河系太大了，光从一边到另一边需要10万年！🌌",
+        galaxyFact: "✨ 趣味知识：银河系中有超过2000亿颗星星！",
+        eclipseTitle: "日食和月食",
+        eclipseText: "日食发生在月球或地球挡住阳光时！在日食期间，月球移动到太阳前面，在地球上投射阴影。在月食期间，地球位于太阳和月球之间，地球的阴影落在月球上，使月球看起来呈红色！🌙",
+        eclipseFact: "🔭 趣味知识：在日食期间，不应该在没有特殊日食眼镜的情况下直接看太阳！"
+      },
+      ja: {
+        mainTitle: "宇宙探検家！",
+        welcomeText: "一緒に素晴らしい宇宙を発見しよう！✨",
+        sunTitle: "太陽",
+        sunText: "太陽は熱くて光り輝くガスの巨大なボールです！私たちに光と暖かさをくれます。太陽はとても大きくて、地球が100万個入るほどです！🌟",
+        sunFact: "⭐ おもしろい事実：太陽は約46億歳です！",
+        moonTitle: "月",
+        moonText: "月は宇宙での地球の親友です！私たちの惑星の周りを回って、空で形が変わります。ボールのように丸いときもあれば、バナナのように見えるときもあります！🍌",
+        moonFact: "🌕 おもしろい事実：宇宙飛行士は月を歩いたことがあります！",
+        planetsTitle: "惑星",
+        planetsText: "私たちの太陽系には8つの惑星があります！すべて太陽の周りを回っています。名前を覚えられますか？",
+        starsTitle: "星",
+        starsText: "星は夜空の小さなきらめきのようです！実際には私たちの太陽のような巨大な火の玉です。宇宙の星は、すべてのビーチの砂粒よりも多いのです！🏖️",
+        starsFact: "✨ おもしろい事実：地球に最も近い恒星（太陽の次）はプロキシマ・ケンタウリと呼ばれています！",
+        gamesTitle: "ミニゲーム！",
+        game1Title: "🌟 星キャッチゲーム",
+        game1Desc: "星をクリックしてキャッチしよう！10秒で何個取れるかな？",
+        startGameText: "ゲームスタート！",
+        scoreLabel: "スコア",
+        timeLabel: "時間",
+        game2Title: "🧠 惑星神経衰弱ゲーム",
+        game2Desc: "惑星をマッチさせよう！2枚のカードをクリックしてペアを見つけよう。",
+        pairsLabel: "見つけたペア",
+        resetText: "リセット",
+        game3Title: "🌟 惑星クイズ！",
+        game3Desc: "宇宙についてのクイズに答えよう！知識をテストしよう！",
+        startQuizText: "クイズを開く！",
+        quizScoreLabel: "スコア",
+        quizResetText: "リセット",
+        footerText: "宇宙を探検し続けよう！あなたは素晴らしい宇宙探検家です！🌌",
+        planets: {
+          mercury: "水星",
+          venus: "金星",
+          earth: "地球",
+          mars: "火星",
+          jupiter: "木星",
+          saturn: "土星",
+          uranus: "天王星",
+          neptune: "海王星"
+        },
+        planetInfo: {
+          mercury: "🟠 水星は最も小さく、太陽に最も近い惑星です！",
+          venus: "🟡 金星は最も暑い惑星 - 水星よりも暑いです！",
+          earth: "🌍 地球は私たちの家！水と空気があって住めます。",
+          mars: "🔴 火星は赤い惑星と呼ばれています。ロボットが探検しています！",
+          jupiter: "🟤 木星は最も大きい惑星。巨大な嵐があります！",
+          saturn: "🪐 土星は氷と岩でできた美しい輪があります！",
+          uranus: "🔵 天王星は転がるボールのように横に回転します！",
+          neptune: "🔷 海王星はとても遠くて、とても寒くて風が強いです！"
+        },
+        quizQuestions: [
+          { q: "どの惑星が太陽に最も近いですか？", a: 0, opts: ["水星", "金星", "地球", "火星"] },
+          { q: "どの惑星が美しい輪を持っていますか？", a: 2, opts: ["木星", "火星", "土星", "海王星"] },
+          { q: "私たちの太陽系に何個の惑星があるか？", a: 2, opts: ["6", "7", "8", "9"] },
+          { q: "火星は何と呼ばれていますか？", a: 2, opts: ["青い惑星", "黄色い惑星", "赤い惑星", "緑色い惑星"] },
+          { q: "最も大きい惑星は何ですか？", a: 0, opts: ["木星", "土星", "海王星", "地球"] }
+        ],
+        solarSystemTitle: "私たちの太陽系",
+        solarSystemText: "太陽系は宇宙での私たちの家です！太陽を中心に、8つの惑星、月、そして小惑星で構成されています。太陽系のすべてが太陽の強い重力で一緒に保たれています！☀️",
+        solarSystemFact: "🌍 おもしろい事実：地球が太陽の周りを1周するのに365日（1年）かかります！",
+        galaxyTitle: "天の川銀河",
+        galaxyText: "私たちの太陽系は天の川という巨大な銀河の中に住んでいます！銀河は重力で一緒に保たれている数十億個の星の大きな家族のようなものです。天の川は非常に大きくて、光が一方の端から他方の端まで移動するのに10万年かかります！🌌",
+        galaxyFact: "✨ おもしろい事実：天の川には2000億個以上の星があります！",
+        eclipseTitle: "日食と月食",
+        eclipseText: "日食は、月または地球が日光を遮ぎるときに起こります！日食中、月は太陽の前に移動し、地球に影を投げかけます。月食中、地球は太陽と月の間に位置し、地球の影が月に落ち、月が赤く見えます！🌙",
+        eclipseFact: "🔭 おもしろい事実：特別な日食眼鏡なしに、日食中に太陽を直接見つめてはいけません！"
+      }
+    };
+    
+    let currentLang = 'en';
+    
+    // Default config
+    const defaultConfig = {
+      main_title: "Space Explorer!",
+      welcome_text: "Let's discover the amazing universe together! ✨",
+      background_color: "#0f0c29",
+      text_color: "#e9d5ff",
+      accent_color: "#fbbf24",
+      button_color: "#22c55e",
+      card_color: "#1e1b4b",
+      font_family: "Fredoka",
+      font_size: 16
+    };
+    
+    // Initialize Element SDK
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange: async (config) => {
+          const title = document.getElementById('main-title');
+          const welcome = document.getElementById('welcome-text');
+          
+          if (title) title.textContent = config.main_title || defaultConfig.main_title;
+          if (welcome) welcome.textContent = config.welcome_text || defaultConfig.welcome_text;
+          
+          // Apply font
+          const fontFamily = config.font_family || defaultConfig.font_family;
+          document.body.style.fontFamily = `${fontFamily}, sans-serif`;
+          
+          // Apply font size scaling
+          const baseSize = config.font_size || defaultConfig.font_size;
+          document.querySelectorAll('h1').forEach(el => el.style.fontSize = `${baseSize * 2.5}px`);
+          document.querySelectorAll('h3').forEach(el => el.style.fontSize = `${baseSize * 1.25}px`);
+          document.querySelectorAll('p').forEach(el => el.style.fontSize = `${baseSize}px`);
+        },
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            {
+              get: () => config.background_color || defaultConfig.background_color,
+              set: (value) => {
+                config.background_color = value;
+                window.elementSdk.setConfig({ background_color: value });
+              }
+            },
+            {
+              get: () => config.text_color || defaultConfig.text_color,
+              set: (value) => {
+                config.text_color = value;
+                window.elementSdk.setConfig({ text_color: value });
+              }
+            },
+            {
+              get: () => config.accent_color || defaultConfig.accent_color,
+              set: (value) => {
+                config.accent_color = value;
+                window.elementSdk.setConfig({ accent_color: value });
+              }
+            },
+            {
+              get: () => config.button_color || defaultConfig.button_color,
+              set: (value) => {
+                config.button_color = value;
+                window.elementSdk.setConfig({ button_color: value });
+              }
+            },
+            {
+              get: () => config.card_color || defaultConfig.card_color,
+              set: (value) => {
+                config.card_color = value;
+                window.elementSdk.setConfig({ card_color: value });
+              }
+            }
+          ],
+          borderables: [],
+          fontEditable: {
+            get: () => config.font_family || defaultConfig.font_family,
+            set: (value) => {
+              config.font_family = value;
+              window.elementSdk.setConfig({ font_family: value });
+            }
+          },
+          fontSizeable: {
+            get: () => config.font_size || defaultConfig.font_size,
+            set: (value) => {
+              config.font_size = value;
+              window.elementSdk.setConfig({ font_size: value });
+            }
+          }
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ["main_title", config.main_title || defaultConfig.main_title],
+          ["welcome_text", config.welcome_text || defaultConfig.welcome_text]
+        ])
+      });
+    }
+    
+    // Create stars background
+    function createStars() {
+      const container = document.getElementById('stars-container');
+      for (let i = 0; i < 100; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.width = Math.random() * 3 + 1 + 'px';
+        star.style.height = star.style.width;
+        star.style.animationDelay = Math.random() * 2 + 's';
+        container.appendChild(star);
+      }
+    }
+    createStars();
+    
+    // Language switching
+    function setLanguage(lang) {
+      currentLang = lang;
+      const t = translations[lang];
+      
+      // Update language button states
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.remove('ring-4', 'ring-yellow-400');
+      });
+      document.getElementById('lang-' + lang).classList.add('ring-4', 'ring-yellow-400');
+      
+      // Update all text content
+      document.getElementById('main-title').textContent = t.mainTitle;
+      document.getElementById('welcome-text').textContent = t.welcomeText;
+      
+      document.getElementById('sun-title').textContent = t.sunTitle;
+      document.getElementById('sun-text').textContent = t.sunText;
+      document.getElementById('sun-fact').textContent = t.sunFact;
+      
+      document.getElementById('moon-title').textContent = t.moonTitle;
+      document.getElementById('moon-text').textContent = t.moonText;
+      document.getElementById('moon-fact').textContent = t.moonFact;
+      
+      document.getElementById('planets-title').textContent = t.planetsTitle;
+      document.getElementById('planets-text').textContent = t.planetsText;
+      
+      document.getElementById('stars-title').textContent = t.starsTitle;
+      document.getElementById('stars-text').textContent = t.starsText;
+      document.getElementById('stars-fact').textContent = t.starsFact;
+      
+      document.getElementById('games-title').textContent = t.gamesTitle;
+      document.getElementById('game1-title').textContent = t.game1Title;
+      document.getElementById('game1-desc').textContent = t.game1Desc;
+      document.getElementById('start-game-text').textContent = t.startGameText;
+      document.getElementById('score-label').textContent = t.scoreLabel;
+      document.getElementById('time-label').textContent = t.timeLabel;
+      
+      document.getElementById('game2-title').textContent = t.game2Title;
+      document.getElementById('game2-desc').textContent = t.game2Desc;
+      document.getElementById('pairs-label').textContent = t.pairsLabel;
+      document.getElementById('reset-text').textContent = t.resetText;
+      
+      document.getElementById('quiz-section-title').textContent = t.game3Title;
+      document.getElementById('quiz-section-desc').textContent = t.game3Desc;
+      document.getElementById('open-quiz-text').textContent = t.startQuizText;
+      document.getElementById('quiz-section-score-label').textContent = t.quizScoreLabel;
+      document.getElementById('quiz-section-reset-text').textContent = t.quizResetText;
+      
+      document.getElementById('footer-text').textContent = t.footerText;
+      
+      // Update planet names
+      document.getElementById('mercury-name').textContent = t.planets.mercury;
+      document.getElementById('venus-name').textContent = t.planets.venus;
+      document.getElementById('earth-name').textContent = t.planets.earth;
+      document.getElementById('mars-name').textContent = t.planets.mars;
+      document.getElementById('jupiter-name').textContent = t.planets.jupiter;
+      document.getElementById('saturn-name').textContent = t.planets.saturn;
+      document.getElementById('uranus-name').textContent = t.planets.uranus;
+      document.getElementById('neptune-name').textContent = t.planets.neptune;
+      
+      // Update Solar System and Galaxy text
+      document.getElementById('solar-system-title').textContent = t.solarSystemTitle;
+      document.getElementById('solar-system-text').textContent = t.solarSystemText;
+      document.getElementById('solar-system-fact').textContent = t.solarSystemFact;
+      
+      document.getElementById('galaxy-title').textContent = t.galaxyTitle;
+      document.getElementById('galaxy-text').textContent = t.galaxyText;
+      document.getElementById('galaxy-fact').textContent = t.galaxyFact;
+      
+      document.getElementById('eclipse-title').textContent = t.eclipseTitle;
+      document.getElementById('eclipse-text').textContent = t.eclipseText;
+      document.getElementById('eclipse-fact').textContent = t.eclipseFact;
+    }
+    
+    // Toggle expandable sections
+    function toggleSection(section) {
+      const content = document.getElementById(section + '-content');
+      const arrow = document.getElementById(section + '-arrow');
+      
+      content.classList.toggle('open');
+      arrow.style.transform = content.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
+    }
+    
+    // Show planet info
+    function showPlanetInfo(planet) {
+      const infoBox = document.getElementById('planet-info');
+      const infoText = document.getElementById('planet-info-text');
+      
+      infoBox.classList.remove('hidden');
+      infoText.textContent = translations[currentLang].planetInfo[planet];
+      
+      // Add bounce animation
+      infoBox.style.animation = 'none';
+      setTimeout(() => {
+        infoBox.style.animation = 'float 0.5s ease';
+      }, 10);
+    }
+    
+    // Star Catcher Game
+    let starScore = 0;
+    let starTime = 10;
+    let starGameInterval = null;
+    let starSpawnInterval = null;
+    
+    function startStarGame() {
+      const area = document.getElementById('star-game-area');
+      const display = document.getElementById('star-game-display');
+      const startBtn = document.getElementById('start-star-game');
+      
+      starScore = 0;
+      starTime = 10;
+      document.getElementById('star-score').textContent = starScore;
+      document.getElementById('star-time').textContent = starTime;
+      
+      startBtn.style.display = 'none';
+      
+      // Clear any existing stars
+      area.querySelectorAll('.game-star').forEach(s => s.remove());
+      
+      // Spawn stars
+      starSpawnInterval = setInterval(() => {
+        const star = document.createElement('span');
+        star.className = 'game-star absolute text-3xl cursor-pointer';
+        star.textContent = '⭐';
+        star.style.left = Math.random() * 80 + 10 + '%';
+        star.style.top = Math.random() * 70 + 10 + '%';
+        star.onclick = () => {
+          starScore++;
+          document.getElementById('star-score').textContent = starScore;
+          star.remove();
+        };
+        area.appendChild(star);
+        
+        // Remove star after 2 seconds if not clicked
+        setTimeout(() => {
+          if (star.parentNode) star.remove();
+        }, 2000);
+      }, 500);
+      
+      // Timer
+      starGameInterval = setInterval(() => {
+        starTime--;
+        document.getElementById('star-time').textContent = starTime;
+        
+        if (starTime <= 0) {
+          clearInterval(starGameInterval);
+          clearInterval(starSpawnInterval);
+          area.querySelectorAll('.game-star').forEach(s => s.remove());
+          startBtn.style.display = 'block';
+          startBtn.querySelector('span').textContent = `🎉 ${starScore} ${translations[currentLang].scoreLabel}! ${translations[currentLang].startGameText}`;
+        }
+      }, 1000);
+    }
+    
+    // Memory Game
+    const memoryEmojis = ['🌍', '🔴', '🪐', '🌙'];
+    let memoryCards = [];
+    let flippedCards = [];
+    let matchedPairs = 0;
+    let canFlip = true;
+    
+    function initMemoryGame() {
+      const gameArea = document.getElementById('memory-game');
+      gameArea.innerHTML = '';
+      
+      // Create pairs
+      memoryCards = [...memoryEmojis, ...memoryEmojis];
+      // Shuffle
+      memoryCards.sort(() => Math.random() - 0.5);
+      
+      memoryCards.forEach((emoji, index) => {
+        const card = document.createElement('button');
+        card.className = 'h-16 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-2xl font-bold transition-all duration-300 flex items-center justify-center';
+        card.dataset.index = index;
+        card.dataset.emoji = emoji;
+        card.textContent = '❓';
+        card.onclick = () => flipCard(card);
+        gameArea.appendChild(card);
+      });
+      
+      matchedPairs = 0;
+      document.getElementById('pairs-found').textContent = matchedPairs;
+      flippedCards = [];
+      canFlip = true;
+    }
+    
+    function flipCard(card) {
+      if (!canFlip || card.dataset.flipped === 'true' || flippedCards.length >= 2) return;
+      
+      card.textContent = card.dataset.emoji;
+      card.dataset.flipped = 'true';
+      card.classList.add('bg-green-500');
+      flippedCards.push(card);
+      
+      if (flippedCards.length === 2) {
+        canFlip = false;
+        
+        if (flippedCards[0].dataset.emoji === flippedCards[1].dataset.emoji) {
+          // Match!
+          matchedPairs++;
+          document.getElementById('pairs-found').textContent = matchedPairs;
+          flippedCards = [];
+          canFlip = true;
+          
+          if (matchedPairs === 4) {
+            setTimeout(() => {
+              const gameArea = document.getElementById('memory-game');
+              gameArea.innerHTML = '<div class="col-span-4 text-center text-2xl text-green-200 font-bold py-8">🎉 ' + (currentLang === 'en' ? 'You Won!' : currentLang === 'th' ? 'คุณชนะ!' : currentLang === 'zh' ? '你赢了！' : 'やったね！') + ' 🎉</div>';
+            }, 500);
+          }
+        } else {
+          // No match
+          setTimeout(() => {
+            flippedCards.forEach(c => {
+              c.textContent = '❓';
+              c.dataset.flipped = 'false';
+              c.classList.remove('bg-green-500');
+            });
+            flippedCards = [];
+            canFlip = true;
+          }, 1000);
+        }
+      }
+    }
+    
+    function resetMemoryGame() {
+      initMemoryGame();
+    }
+    
+    // Initialize memory game
+    initMemoryGame();
+    
+    // Quiz Game
+    let quizIndex = 0;
+    let quizScore = 0;
+    let selectedAnswer = null;
+    
+    function openQuizPopup() {
+      const modal = document.getElementById('quiz-modal');
+      modal.classList.add('open');
+      
+      // Update language text
+      const t = translations[currentLang];
+      document.getElementById('quiz-popup-score-label').textContent = t.quizScoreLabel;
+      document.getElementById('quiz-popup-reset-text').textContent = t.quizResetText;
+      
+      quizIndex = 0;
+      quizScore = 0;
+      selectedAnswer = null;
+      document.getElementById('quiz-popup-score').textContent = '0';
+      showQuizQuestionPopup();
+    }
+    
+    function closeQuizPopup() {
+      const modal = document.getElementById('quiz-modal');
+      modal.classList.remove('open');
+    }
+    
+    function showQuizQuestionPopup() {
+      const content = document.getElementById('quiz-popup-content');
+      const questions = translations[currentLang].quizQuestions;
+      
+      if (quizIndex >= questions.length) {
+        // Quiz complete
+        content.innerHTML = `
+          <div class="text-center">
+            <p class="text-3xl font-bold text-green-200 mb-4">🎉</p>
+            <p class="text-2xl font-bold text-green-200 mb-2">${quizScore}/5</p>
+            <p class="text-lg text-green-100 mb-4">${quizScore >= 4 ? '⭐ Excellent!' : quizScore >= 3 ? '👍 Good Job!' : '💪 Keep Learning!'}</p>
+          </div>
+        `;
+        return;
+      }
+      
+      const q = questions[quizIndex];
+      selectedAnswer = null;
+      
+      content.innerHTML = `
+        <div>
+          <p class="text-lg text-green-200 font-semibold mb-4">Question ${quizIndex + 1}</p>
+          <p class="text-green-100 mb-6">${q.q}</p>
+          <div class="space-y-3">
+            ${q.opts.map((opt, idx) => `
+              <button onclick="selectAnswerPopup(${idx}, ${q.a})" class="quiz-option w-full p-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-green-100 text-left transition-all">
+                ${opt}
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+    
+    function selectAnswerPopup(selected, correct) {
+      if (selectedAnswer !== null) return; // Already answered
+      
+      selectedAnswer = selected;
+      
+      if (selected === correct) {
+        quizScore++;
+        document.getElementById('quiz-popup-score').textContent = quizScore;
+        document.getElementById('quiz-score').textContent = quizScore;
+      }
+      
+      // Highlight correct/incorrect
+      const btns = document.querySelectorAll('#quiz-popup-content .quiz-option');
+      btns.forEach((btn, idx) => {
+        if (idx === correct) btn.classList.add('ring-3', 'ring-green-400', 'bg-green-600');
+        if (idx === selected && selected !== correct) btn.classList.add('ring-3', 'ring-red-400', 'bg-red-600');
+      });
+      
+      // Move to next question after delay
+      setTimeout(() => {
+        quizIndex++;
+        showQuizQuestionPopup();
+      }, 1500);
+    }
+    
+    function resetQuizGame() {
+      quizIndex = 0;
+      quizScore = 0;
+      selectedAnswer = null;
+      document.getElementById('quiz-score').textContent = '0';
+    }
+    
+    function resetQuizPopup() {
+      quizIndex = 0;
+      quizScore = 0;
+      selectedAnswer = null;
+      document.getElementById('quiz-popup-score').textContent = '0';
+      showQuizQuestionPopup();
+    }
+    
+    // Set initial language button as active
+    document.getElementById('lang-en').classList.add('ring-4', 'ring-yellow-400');
+  </script>
+   </div>
+  </div>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9d6d947317db6cc1',t:'MTc3MjU5MjY5NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
