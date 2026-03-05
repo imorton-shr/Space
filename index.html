@@ -723,8 +723,7 @@ function toggleSection(section) {
       }
     };
     
-    let currentLanguage = 'en';
-    
+      
     // Default config
     const defaultConfig = {
       main_title: "Space Explorer!",
@@ -910,15 +909,7 @@ function toggleSection(section) {
       document.getElementById('eclipse-fact').textContent = t.eclipseFact;
     }
     
-    // Toggle expandable sections
-    function toggleSection(section) {
-      const content = document.getElementById(section + '-content');
-      const arrow = document.getElementById(section + '-arrow');
       
-      content.classList.toggle('open');
-      arrow.style.transform = content.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-    
     // Show planet info
     function showPlanetInfo(planet) {
       const infoBox = document.getElementById('planet-info');
