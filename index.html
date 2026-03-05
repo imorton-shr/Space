@@ -428,19 +428,28 @@ function toggleSection(section) {
   const content = document.getElementById(section + '-content');
   const arrow = document.getElementById(section + '-arrow');
 
+  if (!content || !arrow) {
+    console.error("toggleSection: element not found for", section);
+    return;
+  }
+
   const isOpen = content.classList.contains('open');
 
-  if (isOpen) {
-    // 🔴 Closing → stop audio
-    if (currentAudio) {
-      currentAudio.pause();
-      currentAudio.currentTime = 0;
-      currentAudio = null;
-    }
-  } else {
-    // 🟢 Opening → play audio
+  // Stop audio when closing
+  if (isOpen && currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
+  }
+
+  // Play audio when opening
+  if (!isOpen) {
     playAudio(section);
   }
+
+  content.classList.toggle('open');
+  arrow.classList.toggle('rotate-180');
+}
 
   content.classList.toggle('open');
   arrow.classList.toggle('rotate-180');
