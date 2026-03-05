@@ -183,11 +183,11 @@
       </div>
      </div><!-- Our Solar System -->
      <div class="rounded-2xl overflow-hidden shadow-xl" style="background: linear-gradient(135deg, rgba(255,165,0,0.3), rgba(255,215,0,0.3)); border: 3px solid #ffa500;">
-      <button onclick="toggleSection('solar')" class="w-full p-4 flex items-center justify-between text-left">
+      <button onclick="toggleSection('solar_system')" class="w-full p-4 flex items-center justify-between text-left">
        <div class="flex items-center gap-4">
         <span class="text-5xl float" style="animation-delay: 2.5s;">☀️</span> <span id="solar-system-title" class="text-2xl font-bold text-yellow-200">Our Solar System</span>
-       </div><span id="solar-arrow" class="text-3xl text-yellow-200 transition-transform duration-300">▼</span> </button>
-      <div id="solar-content" class="expandable-content bg-black/30">
+       </div><span id="solar_system-arrow" class="text-3xl text-yellow-200 transition-transform duration-300">▼</span> </button>
+      <div id="solar_system-content" class="expandable-content bg-black/30">
        <p id="solar-system-text" class="text-lg text-yellow-100 leading-relaxed">The Solar System is our home in space! It consists of the Sun at the center with 8 planets, moons, and asteroids all orbiting around it. Everything in our Solar System is held together by the Sun's powerful gravity! ☀️</p><!-- Solar System Diagram -->
        <div class="mt-6 mb-6 flex justify-center">
         <svg width="300" height="300" viewbox="0 0 300 300" class="solar-system-diagram"><!-- Orbital paths --> <circle cx="150" cy="150" r="40" fill="none" stroke="#ffa50044" stroke-width="1" stroke-dasharray="2,2" /> <circle cx="150" cy="150" r="70" fill="none" stroke="#ffa50044" stroke-width="1" stroke-dasharray="2,2" /> <circle cx="150" cy="150" r="100" fill="none" stroke="#ffa50044" stroke-width="1" stroke-dasharray="2,2" /> <circle cx="150" cy="150" r="130" fill="none" stroke="#ffa50044" stroke-width="1" stroke-dasharray="2,2" /> <!-- Sun --> <text x="150" y="160" text-anchor="middle" font-size="28">
@@ -718,7 +718,7 @@ function toggleSection(section) {
       }
     };
     
-    let currentLang = 'en';
+    let currentLanguage = 'en';
     
     // Default config
     const defaultConfig = {
@@ -920,7 +920,7 @@ function toggleSection(section) {
       const infoText = document.getElementById('planet-info-text');
       
       infoBox.classList.remove('hidden');
-      infoText.textContent = translations[currentLang].planetInfo[planet];
+      infoText.textContent = translations[currentLanguage].planetInfo[planet];
       
       // Add bounce animation
       infoBox.style.animation = 'none';
@@ -980,7 +980,7 @@ function toggleSection(section) {
           clearInterval(starSpawnInterval);
           area.querySelectorAll('.game-star').forEach(s => s.remove());
           startBtn.style.display = 'block';
-          startBtn.querySelector('span').textContent = `🎉 ${starScore} ${translations[currentLang].scoreLabel}! ${translations[currentLang].startGameText}`;
+          startBtn.querySelector('span').textContent = `🎉 ${starScore} ${translations[currentLanguage].scoreLabel}! ${translations[currentLanguage].startGameText}`;
         }
       }, 1000);
     }
@@ -1038,7 +1038,7 @@ function toggleSection(section) {
           if (matchedPairs === 4) {
             setTimeout(() => {
               const gameArea = document.getElementById('memory-game');
-              gameArea.innerHTML = '<div class="col-span-4 text-center text-2xl text-green-200 font-bold py-8">🎉 ' + (currentLang === 'en' ? 'You Won!' : currentLang === 'th' ? 'คุณชนะ!' : currentLang === 'zh' ? '你赢了！' : 'やったね！') + ' 🎉</div>';
+              gameArea.innerHTML = '<div class="col-span-4 text-center text-2xl text-green-200 font-bold py-8">🎉 ' + (currentLanguage === 'en' ? 'You Won!' : currentLanguage === 'th' ? 'คุณชนะ!' : currentLanguage === 'zh' ? '你赢了！' : 'やったね！') + ' 🎉</div>';
             }, 500);
           }
         } else {
@@ -1073,7 +1073,7 @@ function toggleSection(section) {
       modal.classList.add('open');
       
       // Update language text
-      const t = translations[currentLang];
+      const t = translations[currentLanguage];
       document.getElementById('quiz-popup-score-label').textContent = t.quizScoreLabel;
       document.getElementById('quiz-popup-reset-text').textContent = t.quizResetText;
       
@@ -1091,7 +1091,7 @@ function toggleSection(section) {
     
     function showQuizQuestionPopup() {
       const content = document.getElementById('quiz-popup-content');
-      const questions = translations[currentLang].quizQuestions;
+      const questions = translations[currentLanguage].quizQuestions;
       
       if (quizIndex >= questions.length) {
         // Quiz complete
